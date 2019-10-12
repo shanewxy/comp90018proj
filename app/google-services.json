@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "915494144136",
+    "firebase_url": "https://check-me-in-263bc.firebaseio.com",
+    "project_id": "check-me-in-263bc",
+    "storage_bucket": "check-me-in-263bc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:915494144136:android:283853db57563c6890f73d",
+        "android_client_info": {
+          "package_name": "com.unimelb.checkmein"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "915494144136-8uikikuuttmesvfeetartki7vfn3jilk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.unimelb.checkmein",
+            "certificate_hash": "be7c244fce6674c7469fffbd92bf1e249d5e1a58"
+          }
+        },
+        {
+          "client_id": "915494144136-ctl16227ug0p0p57lbalrjknhltr1jig.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDkyElI48vQfvmMhbHfmh8IxOwpW3o_yng"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "915494144136-ctl16227ug0p0p57lbalrjknhltr1jig.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

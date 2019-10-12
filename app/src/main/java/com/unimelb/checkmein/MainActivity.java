@@ -22,27 +22,29 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.view.Menu;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "Main";
-
+    private FirebaseAuth auth = FirebaseAuth.getInstance();
     private AppBarConfiguration mAppBarConfiguration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         FloatingActionButton fab = findViewById(R.id.fab);
+        final String email = auth.getCurrentUser().getEmail();
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 //                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
-                FirebaseAuth auth = FirebaseAuth.getInstance();
-                Log.d(TAG, "onClick: "+auth.getCurrentUser().getEmail());
+                Log.d(TAG, "onClick: " + email);
                 auth.signOut();
                 finish();
                 Intent intent = new Intent();
@@ -62,6 +64,9 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+        View hView = navigationView.getHeaderView(0);
+        TextView nav_user = (TextView)hView.findViewById(R.id.email_textView);
+        nav_user.setText(email);
     }
 
     @Override
