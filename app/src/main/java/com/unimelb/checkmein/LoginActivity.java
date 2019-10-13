@@ -50,7 +50,7 @@ public class LoginActivity extends BaseActivity implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_emailpassword);
 
         // Views
         mStatusTextView = findViewById(R.id.status);
@@ -101,7 +101,7 @@ public class LoginActivity extends BaseActivity implements
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(LoginActivity.this, "Authentication failed.",
+                            Toast.makeText(LoginActivity.this, "Authentication failed creating user.",
                                     Toast.LENGTH_SHORT).show();
                             updateUI(null);
                         }
