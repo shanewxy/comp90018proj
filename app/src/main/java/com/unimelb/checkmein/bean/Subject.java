@@ -1,10 +1,13 @@
-package com.unimelb.checkmein.ui.gallery;
+package com.unimelb.checkmein.bean;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Subject {
-    String code;
+    private String code;
+    private int times = 0;
 
-
-    String name;
+    private String name;
 
     public Subject() {
     }
@@ -36,5 +39,22 @@ public class Subject {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public int getTimes() {
+        return times;
+    }
+
+    public void setTimes(int times) {
+        this.times = times;
+    }
+
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("code", code);
+        result.put("name", name);
+        result.put("times", times);
+
+        return result;
     }
 }
