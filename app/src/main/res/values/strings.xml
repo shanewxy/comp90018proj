@@ -116,4 +116,8 @@
 
     <string name="custom_auth_signin_status_user">User ID: %s</string>
     <string name="custom_auth_signin_status_failed">Error: sign in failed</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="title_activity_check_in">CheckInActivity</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
 </resources>

@@ -1,4 +1,4 @@
-package com.unimelb.checkmein.ui.slideshow;
+package com.unimelb.checkmein.ui.mySubjects;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

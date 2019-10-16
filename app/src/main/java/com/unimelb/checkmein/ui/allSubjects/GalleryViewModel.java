@@ -1,4 +1,4 @@
-package com.unimelb.checkmein.ui.gallery;
+package com.unimelb.checkmein.ui.allSubjects;
 
 import android.util.Log;
 

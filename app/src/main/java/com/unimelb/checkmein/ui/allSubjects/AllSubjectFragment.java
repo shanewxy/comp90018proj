@@ -1,19 +1,11 @@
-package com.unimelb.checkmein.ui.slideshow;
+package com.unimelb.checkmein.ui.allSubjects;
 
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.Switch;
-import android.widget.TextView;
-
-import androidx.annotation.Nullable;
-import androidx.annotation.NonNull;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -23,35 +15,27 @@ import com.unimelb.checkmein.R;
 import com.unimelb.checkmein.bean.Subject;
 import com.unimelb.checkmein.ui.SubjectFragment;
 import com.unimelb.checkmein.ui.SubjectViewHolder;
-import com.unimelb.checkmein.ui.gallery.AllSubjectFragment;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class MySubjectFragment extends SubjectFragment {
-    private String TAG = "MySubjectFragment";
-
-    public MySubjectFragment() {
-
-    }
-
+public class AllSubjectFragment extends SubjectFragment {
+    private final String TAG = "AllSubjectFragment";
 
     @Override
     public Query getQuery(DatabaseReference databaseReference) {
-        // All my posts
-        return databaseReference.child("user-subjects")
-                .child(getUid());
+        Query recentPostsQuery = databaseReference.child("subject")
+                .limitToFirst(100);
+        return recentPostsQuery;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Query postsQuery = getQuery(mDatabase);
-
+                Query postsQuery = getQuery(mDatabase);
         FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Subject>()
                 .setQuery(postsQuery, Subject.class)
                 .build();
-
         mAdapter = new FirebaseRecyclerAdapter<Subject, SubjectViewHolder>(options) {
 
             @Override
@@ -64,17 +48,35 @@ public class MySubjectFragment extends SubjectFragment {
             protected void onBindViewHolder(SubjectViewHolder viewHolder, int position, final Subject model) {
 
                 final DatabaseReference postRef = getRef(position);
-                viewHolder.aSwitch.setVisibility(View.GONE);
+
+                // Set click listener for the whole post view
+                final String postKey = postRef.getKey();
+                if (model.getStudents().containsKey(getUid())) {
+                    viewHolder.aSwitch.setChecked(true);
+                } else viewHolder.aSwitch.setChecked(false);
+//              Bind Post to ViewHolder, setting OnClickListener for the star button
                 viewHolder.bindToPost(model, new Switch.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                        DatabaseReference globalPostRef = mDatabase.child("subject").child(postRef.getKey());
+//                        DatabaseReference userPostRef = mDatabase.child("user-subjects").child(model.getCode()).child(postRef.getKey());
+                        onChecked(globalPostRef);
+//                        onChecked(userPostRef);
+                        Map<String, Object> updates = new HashMap<>();
+                        if (b) {
+                            Log.d(TAG, "onCheckedChanged: " + model);
+                            updates.put("/user-subjects/" + getUid() + "/" + postKey, model.toMap());
+                        } else {
+//                            model.setValid(false);
+                            updates.put("/user-subjects/" + getUid() + "/" + postKey, null);
 
+                        }
+                            mDatabase.updateChildren(updates);
                     }
                 });
+//
             }
         };
         mRecycler.setAdapter(mAdapter);
-
     }
-
 }

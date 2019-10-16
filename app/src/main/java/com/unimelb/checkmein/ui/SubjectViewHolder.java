@@ -39,4 +39,15 @@ public class SubjectViewHolder extends RecyclerView.ViewHolder {
 
         aSwitch.setOnCheckedChangeListener(switchListener);
     }
+
+    public void bindToPost(Subject subject, TextView.OnClickListener clickListener) {
+        titleView.setText(subject.getCode());
+//        authorView.setText(subject.author);
+//        numStarsView.setText(String.valueOf(subject.starCount));
+        bodyView.setText(subject.getName());
+
+        titleView.setOnClickListener(clickListener);
+        bodyView.setOnClickListener(clickListener);
+    }
+
 }
