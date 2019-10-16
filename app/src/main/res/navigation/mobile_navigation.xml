@@ -11,18 +11,18 @@
         android:label="@string/menu_home"
         tools:layout="@layout/fragment_home" />
 
-    <fragment
-        android:id="@+id/nav_gallery"
-        android:name="com.unimelb.checkmein.ui.gallery.SubjectFragment"
-        android:label="@string/menu_gallery"
-        tools:layout="@layout/fragment_gallery" />
 
     <fragment
         android:id="@+id/nav_slideshow"
-        android:name="com.unimelb.checkmein.ui.slideshow.SlideshowFragment"
+        android:name="com.unimelb.checkmein.ui.slideshow.MySubjectFragment"
         android:label="@string/menu_slideshow"
         tools:layout="@layout/fragment_slideshow" />
 
+    <fragment
+        android:id="@+id/nav_gallery"
+        android:name="com.unimelb.checkmein.ui.gallery.AllSubjectFragment"
+        android:label="@string/menu_gallery"
+        tools:layout="@layout/fragment_gallery" />
     <fragment
         android:id="@+id/nav_tools"
         android:name="com.unimelb.checkmein.ui.tools.ToolsFragment"

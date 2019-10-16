@@ -1,4 +1,4 @@
-package com.unimelb.checkmein.ui.gallery;
+package com.unimelb.checkmein.ui;
 
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,6 +28,7 @@ public class SubjectViewHolder extends RecyclerView.ViewHolder {
 //        bodyView = itemView.findViewById(R.id.postBody);
         titleView = itemView.findViewById(R.id.list_example_code);
         bodyView = itemView.findViewById(R.id.list_example_text);
+
     }
 
     public void bindToPost(Subject subject, Switch.OnCheckedChangeListener switchListener) {
