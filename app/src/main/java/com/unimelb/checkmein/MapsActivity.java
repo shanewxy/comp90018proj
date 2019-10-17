@@ -2,10 +2,14 @@ package com.unimelb.checkmein;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -23,6 +27,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -31,6 +36,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
 import com.unimelb.checkmein.bean.Subject;
+import com.unimelb.checkmein.bean.User;
+import com.unimelb.checkmein.ui.rank.RankFragment;
+import com.unimelb.checkmein.ui.rank.ScrollingActivity;
 
 import java.util.List;
 import java.util.Map;
@@ -43,14 +51,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private Button button;
     protected DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-
+    private FloatingActionButton fab;
     private String TAG = MapsActivity.class.toString();
+    public String subjectKey;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-        final DatabaseReference postRef = mDatabase.child("subject").child(getIntent().getStringExtra("dbkey"));
+        subjectKey = getIntent().getStringExtra("dbkey");
+        final DatabaseReference postRef = mDatabase.child("subject").child(subjectKey);
         setContentView(R.layout.activity_map);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
 //        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -65,6 +74,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMapView.onCreate(mapViewBundle);
 
         mMapView.getMapAsync(this);
+        fab = findViewById(R.id.fabRank);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                FragmentManager fragmentManager = getSupportFragmentManager();
+//                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//                fragmentTransaction.replace(R.id.mapView2, RankFragment.newInstance(subjectKey));
+//                fragmentTransaction.commit();
+                Intent intent=new Intent();
+                intent.setClass(MapsActivity.this,ScrollingActivity.class);
+                intent.putExtra("subject",subjectKey);
+                startActivity(intent);
+            }
+        });
         button = findViewById(R.id.checkInButton);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,11 +99,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         if (p == null) {
                             return Transaction.success(mutableData);
                         }
-                        Map<String, Integer> students = p.getStudents();
+                        Map<String, User> students = p.getStudents();
                         if (students.containsKey(getUid())) {
                             // Unstar the post and remove self from stars
 //                    p.setTimes(p.getTimes() - 1);
-                            students.put(getUid(), students.get(getUid()) + 1);
+                            User user = students.get(getUid());
+                            user.count += 1;
+                            students.put(getUid(), user);
                         } else {
                             // Star the post and add self to stars
 //                    p.starCount = p.starCount + 1;
@@ -96,7 +121,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     public void onComplete(DatabaseError databaseError, boolean b,
                                            DataSnapshot dataSnapshot) {
                         // Transaction completed
+                        if (b)
+                            Toast.makeText(MapsActivity.this, "successfully checked in!", Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "postTransaction:onComplete:" + databaseError);
+
                     }
                 });
             }

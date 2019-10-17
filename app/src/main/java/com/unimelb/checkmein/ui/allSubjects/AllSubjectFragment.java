@@ -26,6 +26,7 @@ public class AllSubjectFragment extends SubjectFragment {
     public Query getQuery(DatabaseReference databaseReference) {
         Query recentPostsQuery = databaseReference.child("subject")
                 .limitToFirst(100);
+        Log.d(TAG, "getQuery: ");
         return recentPostsQuery;
     }
 
@@ -36,6 +37,7 @@ public class AllSubjectFragment extends SubjectFragment {
         FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Subject>()
                 .setQuery(postsQuery, Subject.class)
                 .build();
+        Log.d(TAG, "onActivityCreated: "+options.getSnapshots());
         mAdapter = new FirebaseRecyclerAdapter<Subject, SubjectViewHolder>(options) {
 
             @Override
@@ -63,7 +65,7 @@ public class AllSubjectFragment extends SubjectFragment {
                         onChecked(globalPostRef);
 //                        onChecked(userPostRef);
                         Map<String, Object> updates = new HashMap<>();
-                        if (b) {
+                        if (!model.getStudents().containsKey(getUid())) {
                             Log.d(TAG, "onCheckedChanged: " + model);
                             updates.put("/user-subjects/" + getUid() + "/" + postKey, model.toMap());
                         } else {

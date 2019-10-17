@@ -6,7 +6,7 @@ import java.util.Map;
 public class Subject {
     private String code;
     private int times = 0;
-    private Map<String, Integer> students = new HashMap<>();
+    private Map<String, User> students = new HashMap<>();
     private String name;
     private boolean isValid = true;
 
@@ -50,11 +50,11 @@ public class Subject {
         this.times = times;
     }
 
-    public Map<String, Integer> getStudents() {
+    public Map<String, User> getStudents() {
         return students;
     }
 
-    public void setStudents(Map<String, Integer> students) {
+    public void setStudents(Map<String, User> students) {
         this.students = students;
     }
 

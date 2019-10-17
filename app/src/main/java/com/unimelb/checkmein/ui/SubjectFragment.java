@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -24,6 +25,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.Transaction;
 import com.unimelb.checkmein.R;
 import com.unimelb.checkmein.bean.Subject;
+import com.unimelb.checkmein.bean.User;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +33,7 @@ import java.util.Map;
 public abstract class SubjectFragment extends Fragment {
 
     private static final String TAG = "SubjectFragment";
-
+    private User user;
     // [START define_database_reference]
     protected DatabaseReference mDatabase;
     // [END define_database_reference]
@@ -39,6 +41,7 @@ public abstract class SubjectFragment extends Fragment {
     protected FirebaseRecyclerAdapter<Subject, SubjectViewHolder> mAdapter;
     protected RecyclerView mRecycler;
     protected LinearLayoutManager mManager;
+    FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
     public SubjectFragment() {
     }
@@ -48,7 +51,7 @@ public abstract class SubjectFragment extends Fragment {
                              Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View rootView = inflater.inflate(R.layout.fragment_gallery, container, false);
-
+        user = getUser();
         // [START create_database_reference]
         mDatabase = FirebaseDatabase.getInstance().getReference();
         // [END create_database_reference]
@@ -92,8 +95,8 @@ public abstract class SubjectFragment extends Fragment {
 //                // Set click listener for the whole post view
 //                final String postKey = postRef.getKey();
 //                if (model.getStudents().containsKey(getUid())) {
-//                    viewHolder.aSwitch.setChecked(true);
-//                } else viewHolder.aSwitch.setChecked(false);
+//                    viewHolder.count.setChecked(true);
+//                } else viewHolder.count.setChecked(false);
 ////              Bind Post to ViewHolder, setting OnClickListener for the star button
 //                viewHolder.bindToPost(model, new Switch.OnCheckedChangeListener() {
 //                    @Override
@@ -129,14 +132,14 @@ public abstract class SubjectFragment extends Fragment {
                     return Transaction.success(mutableData);
                 }
 
-                if (p.getStudents().containsKey(getUid())) {
+                if (p.getStudents().containsValue(user)) {
                     // Unstar the post and remove self from stars
 //                    p.setTimes(p.getTimes() - 1);
                     p.getStudents().remove(getUid());
                 } else {
                     // Star the post and add self to stars
 //                    p.starCount = p.starCount + 1;
-                    p.getStudents().put(getUid(), 0);
+                    p.getStudents().put(getUid(), user);
                 }
 
                 // Set value and report transaction success
@@ -172,7 +175,13 @@ public abstract class SubjectFragment extends Fragment {
     }
 
     public String getUid() {
-        return FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        return currentUser.getUid();
+    }
+
+    public User getUser() {
+
+        return new User(getUid(), currentUser.getEmail());
     }
 
     public abstract Query getQuery(DatabaseReference databaseReference);
