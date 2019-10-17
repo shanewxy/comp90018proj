@@ -11,6 +11,9 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -20,8 +23,17 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
+import com.unimelb.checkmein.bean.Subject;
 
 import java.util.List;
+import java.util.Map;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
     private LocationManager locationManager;
@@ -29,12 +41,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private MapView mMapView;
     private String MAPVIEW_BUNDLE_KEY = "AIzaSyA65laX25e6zcQ0H5RLPWRMqj7z0z07hEY";
     private GoogleMap mMap;
+    private Button button;
+    protected DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
 
+    private String TAG = MapsActivity.class.toString();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+        final DatabaseReference postRef = mDatabase.child("subject").child(getIntent().getStringExtra("dbkey"));
         setContentView(R.layout.activity_map);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
 //        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -49,7 +65,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMapView.onCreate(mapViewBundle);
 
         mMapView.getMapAsync(this);
+        button = findViewById(R.id.checkInButton);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                postRef.runTransaction(new Transaction.Handler() {
+                    @Override
+                    public Transaction.Result doTransaction(MutableData mutableData) {
+                        Subject p = mutableData.getValue(Subject.class);
+                        if (p == null) {
+                            return Transaction.success(mutableData);
+                        }
+                        Map<String, Integer> students = p.getStudents();
+                        if (students.containsKey(getUid())) {
+                            // Unstar the post and remove self from stars
+//                    p.setTimes(p.getTimes() - 1);
+                            students.put(getUid(), students.get(getUid()) + 1);
+                        } else {
+                            // Star the post and add self to stars
+//                    p.starCount = p.starCount + 1;
+//                            p.getStudents().put(getUid(), 0);
+                        }
 
+                        // Set value and report transaction success
+                        mutableData.setValue(p);
+                        return Transaction.success(mutableData);
+                    }
+
+                    @Override
+                    public void onComplete(DatabaseError databaseError, boolean b,
+                                           DataSnapshot dataSnapshot) {
+                        // Transaction completed
+                        Log.d(TAG, "postTransaction:onComplete:" + databaseError);
+                    }
+                });
+            }
+        });
     }
 
     LocationListener locationListener = new LocationListener() {
@@ -198,4 +249,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onLowMemory();
         mMapView.onLowMemory();
     }
+
+    public String getUid() {
+        return FirebaseAuth.getInstance().getCurrentUser().getUid();
+    }
+
 }

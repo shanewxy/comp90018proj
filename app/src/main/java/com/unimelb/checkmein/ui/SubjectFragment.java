@@ -136,7 +136,7 @@ public abstract class SubjectFragment extends Fragment {
                 } else {
                     // Star the post and add self to stars
 //                    p.starCount = p.starCount + 1;
-                    p.getStudents().put(getUid(), true);
+                    p.getStudents().put(getUid(), 0);
                 }
 
                 // Set value and report transaction success

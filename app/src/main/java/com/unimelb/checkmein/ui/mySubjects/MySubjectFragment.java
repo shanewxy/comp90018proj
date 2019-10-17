@@ -62,6 +62,7 @@ public class MySubjectFragment extends SubjectFragment {
                     public void onClick(View view) {
                         Intent intent = new Intent();
                         intent.setClass(getActivity(), MapsActivity.class);
+                        intent.putExtra("dbkey", postRef.getKey());
                         startActivity(intent);
                     }
                 });
