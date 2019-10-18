@@ -35,6 +35,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
+import com.unimelb.checkmein.bean.Building;
 import com.unimelb.checkmein.bean.Subject;
 import com.unimelb.checkmein.bean.User;
 import com.unimelb.checkmein.ui.rank.RankFragment;
@@ -55,6 +56,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private FloatingActionButton fab;
     private String TAG = MapsActivity.class.toString();
     public String subjectKey;
+    private Location lastLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +73,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (savedInstanceState != null) {
             mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
         }
-        mMapView = (MapView) findViewById(R.id.mapView2);
+        mMapView = findViewById(R.id.mapView2);
         mMapView.onCreate(mapViewBundle);
 
         mMapView.getMapAsync(this);
@@ -102,21 +104,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             return Transaction.success(mutableData);
                         }
                         Map<String, User> students = p.getStudents();
-                        if (students.containsKey(getUid())) {
+                        Building building = p.getBuilding();
+                        float[] distance = new float[3];
+                        Location.distanceBetween(building.latitude, building.longitude, lastLocation.getLatitude(), lastLocation.getLongitude(), distance);
+
+//                        LatLng target = new LatLng(building.getLatitude(), building.getLongitude());
+//                        mMap.addMarker(new MarkerOptions().position(target).title(p.getName()));
+//                        mMap.moveCamera(CameraUpdateFactory.newLatLng(target));
+                        Log.d(TAG, "doTransaction: " + distance[0]);
+                        if (distance[0] < 100) {
                             // Unstar the post and remove self from stars
 //                    p.setTimes(p.getTimes() - 1);
                             User user = students.get(getUid());
                             user.count += 1;
                             students.put(getUid(), user);
+                            mutableData.setValue(p);
+                            return Transaction.success(mutableData);
                         } else {
-                            // Star the post and add self to stars
-//                    p.starCount = p.starCount + 1;
-//                            p.getStudents().put(getUid(), 0);
+                            return Transaction.abort();
                         }
 
                         // Set value and report transaction success
-                        mutableData.setValue(p);
-                        return Transaction.success(mutableData);
                     }
 
                     @Override
@@ -125,6 +133,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         // Transaction completed
                         if (b)
                             Toast.makeText(MapsActivity.this, "successfully checked in!", Toast.LENGTH_SHORT).show();
+                        else
+                            Toast.makeText(MapsActivity.this, "Fail! Too far away!", Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "postTransaction:onComplete:" + databaseError);
 
                     }
@@ -211,11 +221,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Toast.LENGTH_LONG).show();
             return;
         }
-        Location location = locationManager.getLastKnownLocation(provider);
-        if (location != null) {
+        lastLocation = locationManager.getLastKnownLocation(provider);
+        if (lastLocation != null) {
             //获取当前位置，这里只用到了经纬度
-            String string = "纬度为：" + location.getLatitude() + ",经度为："
-                    + location.getLongitude();
+            String string = "纬度为：" + lastLocation.getLatitude() + ",经度为："
+                    + lastLocation.getLongitude();
         }
 
 //绑定定位事件，监听位置是否改变
@@ -224,7 +234,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         locationManager.requestLocationUpdates(provider, 2000, 2,
                 locationListener);
 //        LatLng sydney = new LatLng(-34, 151);
-        LatLng sydney = new LatLng(location.getLatitude(), location.getLongitude());
+        LatLng sydney = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         mMap.setMyLocationEnabled(true);

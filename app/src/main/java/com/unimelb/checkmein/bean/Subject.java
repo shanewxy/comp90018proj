@@ -9,6 +9,7 @@ public class Subject {
     private Map<String, User> students = new HashMap<>();
     private String name;
     private boolean isValid = true;
+    public Building building;
 
     public Subject() {
     }
@@ -66,6 +67,14 @@ public class Subject {
         isValid = valid;
     }
 
+    public Building getBuilding() {
+        return building;
+    }
+
+    public void setBuilding(Building building) {
+        this.building = building;
+    }
+
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
         result.put("code", code);
@@ -73,6 +82,8 @@ public class Subject {
         result.put("times", times);
         result.put("students", students);
         result.put("valid", isValid);
+        result.put("building", building);
         return result;
     }
+
 }
