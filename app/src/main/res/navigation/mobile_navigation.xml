@@ -16,13 +16,13 @@
         android:id="@+id/nav_slideshow"
         android:name="com.unimelb.checkmein.ui.mySubjects.MySubjectFragment"
         android:label="@string/menu_slideshow"
-        tools:layout="@layout/fragment_slideshow" />
+        tools:layout="@layout/fragment_allsubject" />
 
     <fragment
         android:id="@+id/nav_gallery"
         android:name="com.unimelb.checkmein.ui.allSubjects.AllSubjectFragment"
         android:label="@string/menu_gallery"
-        tools:layout="@layout/fragment_gallery" />
+        tools:layout="@layout/fragment_mysubject" />
     <fragment
         android:id="@+id/nav_tools"
         android:name="com.unimelb.checkmein.ui.tools.ToolsFragment"

@@ -38,6 +38,7 @@ import com.google.firebase.database.Transaction;
 import com.unimelb.checkmein.bean.Subject;
 import com.unimelb.checkmein.bean.User;
 import com.unimelb.checkmein.ui.rank.RankFragment;
+import com.unimelb.checkmein.ui.rank.RankViewHolder;
 import com.unimelb.checkmein.ui.rank.ScrollingActivity;
 
 import java.util.List;
@@ -82,10 +83,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 //                fragmentTransaction.replace(R.id.mapView2, RankFragment.newInstance(subjectKey));
 //                fragmentTransaction.commit();
-                Intent intent=new Intent();
-                intent.setClass(MapsActivity.this,ScrollingActivity.class);
-                intent.putExtra("subject",subjectKey);
+                Intent intent = new Intent();
+                intent.setClass(MapsActivity.this, ScrollingActivity.class);
+                intent.putExtra("subject", subjectKey);
                 startActivity(intent);
+                RankViewHolder.rank_increment = 1;
             }
         });
         button = findViewById(R.id.checkInButton);

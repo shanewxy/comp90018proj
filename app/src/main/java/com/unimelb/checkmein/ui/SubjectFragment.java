@@ -5,15 +5,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
-import android.widget.Switch;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -26,9 +23,6 @@ import com.google.firebase.database.Transaction;
 import com.unimelb.checkmein.R;
 import com.unimelb.checkmein.bean.Subject;
 import com.unimelb.checkmein.bean.User;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public abstract class SubjectFragment extends Fragment {
 
@@ -50,7 +44,7 @@ public abstract class SubjectFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        View rootView = inflater.inflate(R.layout.fragment_gallery, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_mysubject, container, false);
         user = getUser();
         // [START create_database_reference]
         mDatabase = FirebaseDatabase.getInstance().getReference();

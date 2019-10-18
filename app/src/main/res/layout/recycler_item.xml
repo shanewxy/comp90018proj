@@ -4,7 +4,8 @@
     android:layout_height="wrap_content"
     android:layout_margin="5dp"
     android:orientation="horizontal"
-    android:background="#008B8B">
+    android:background="#008B8B"
+    android:padding="10dp">
 
 
     <TextView
@@ -17,13 +18,13 @@
         android:gravity="center"/>
 
     <TextView
-        android:textColor="#fff"
-
         android:id="@+id/list_example_text"
-        android:layout_width="126dp"
+
+        android:layout_width="117dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:gravity="center"/>/>
+        android:gravity="center"
+        android:textColor="#fff" />/>
 
     <Switch
         android:id="@+id/switch1"
@@ -34,6 +35,6 @@
         android:text="add"
         android:textColor="#fff"
 
-        android:textSize="20dp" />/>
+        android:textSize="12sp" />/>
 
 </LinearLayout>
