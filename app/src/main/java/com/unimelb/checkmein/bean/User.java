@@ -1,5 +1,6 @@
 package com.unimelb.checkmein.bean;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -8,9 +9,9 @@ public class User {
     public String uid;
     public String username;
     public int count;
+    public String date;
 
     public User() {
-
     }
 
     public User(String uid, String username) {

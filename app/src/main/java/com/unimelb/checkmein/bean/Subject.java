@@ -5,10 +5,8 @@ import java.util.Map;
 
 public class Subject {
     private String code;
-    private int times = 0;
     private Map<String, User> students = new HashMap<>();
     private String name;
-    private boolean isValid = true;
     public Building building;
 
     public Subject() {
@@ -43,13 +41,6 @@ public class Subject {
         this.code = code;
     }
 
-    public int getTimes() {
-        return times;
-    }
-
-    public void setTimes(int times) {
-        this.times = times;
-    }
 
     public Map<String, User> getStudents() {
         return students;
@@ -59,13 +50,7 @@ public class Subject {
         this.students = students;
     }
 
-    public boolean isValid() {
-        return isValid;
-    }
 
-    public void setValid(boolean valid) {
-        isValid = valid;
-    }
 
     public Building getBuilding() {
         return building;
@@ -79,9 +64,7 @@ public class Subject {
         HashMap<String, Object> result = new HashMap<>();
         result.put("code", code);
         result.put("name", name);
-        result.put("times", times);
         result.put("students", students);
-        result.put("valid", isValid);
         result.put("building", building);
         return result;
     }

@@ -2,10 +2,7 @@ package com.unimelb.checkmein;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
 import android.content.Context;
@@ -24,7 +21,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -38,10 +34,11 @@ import com.google.firebase.database.Transaction;
 import com.unimelb.checkmein.bean.Building;
 import com.unimelb.checkmein.bean.Subject;
 import com.unimelb.checkmein.bean.User;
-import com.unimelb.checkmein.ui.rank.RankFragment;
 import com.unimelb.checkmein.ui.rank.RankViewHolder;
 import com.unimelb.checkmein.ui.rank.ScrollingActivity;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -61,13 +58,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         subjectKey = getIntent().getStringExtra("dbkey");
         final DatabaseReference postRef = mDatabase.child("subject").child(subjectKey);
         setContentView(R.layout.activity_map);
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-//        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-//                .findFragmentById(R.id.map);
-//        mapFragment.getMapAsync(this);
         //获取定位服务
         Bundle mapViewBundle = null;
         if (savedInstanceState != null) {
@@ -112,19 +106,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //                        mMap.addMarker(new MarkerOptions().position(target).title(p.getName()));
 //                        mMap.moveCamera(CameraUpdateFactory.newLatLng(target));
                         Log.d(TAG, "doTransaction: " + distance[0]);
-                        if (distance[0] < 100) {
+                        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+                        String today = sdf.format(Calendar.getInstance().getTime());
+                        User user = students.get(getUid());
+
+                        if (!today.equals(user.date) && distance[0] < 100) {
                             // Unstar the post and remove self from stars
-//                    p.setTimes(p.getTimes() - 1);
-                            User user = students.get(getUid());
                             user.count += 1;
+                            user.date = today;
                             students.put(getUid(), user);
                             mutableData.setValue(p);
                             return Transaction.success(mutableData);
                         } else {
                             return Transaction.abort();
                         }
-
-                        // Set value and report transaction success
                     }
 
                     @Override
@@ -134,7 +129,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         if (b)
                             Toast.makeText(MapsActivity.this, "successfully checked in!", Toast.LENGTH_SHORT).show();
                         else
-                            Toast.makeText(MapsActivity.this, "Fail! Too far away!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MapsActivity.this, "Fail!!", Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "postTransaction:onComplete:" + databaseError);
 
                     }
@@ -222,20 +217,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return;
         }
         lastLocation = locationManager.getLastKnownLocation(provider);
-        if (lastLocation != null) {
-            //获取当前位置，这里只用到了经纬度
-            String string = "纬度为：" + lastLocation.getLatitude() + ",经度为："
-                    + lastLocation.getLongitude();
-        }
 
 //绑定定位事件，监听位置是否改变
 //第一个参数为控制器类型第二个参数为监听位置变化的时间间隔（单位：毫秒）
 //第三个参数为位置变化的间隔（单位：米）第四个参数为位置监听器
         locationManager.requestLocationUpdates(provider, 2000, 2,
                 locationListener);
-//        LatLng sydney = new LatLng(-34, 151);
         LatLng sydney = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        mMap.addMarker(new MarkerOptions().position(sydney).title("current location"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         mMap.setMyLocationEnabled(true);
     }
