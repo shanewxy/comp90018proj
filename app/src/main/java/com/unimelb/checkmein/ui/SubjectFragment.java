@@ -162,6 +162,7 @@ public abstract class SubjectFragment extends Fragment {
         if (mAdapter != null) {
             mAdapter.startListening();
         }
+//        mProgressDialog.dismiss();
     }
 
     @Override

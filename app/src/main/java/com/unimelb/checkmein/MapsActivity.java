@@ -254,7 +254,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         locationManager.requestLocationUpdates(provider, 2000, 2,
                 locationListener);
         LatLng sydney = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
-        mMap.addMarker(new MarkerOptions().position(sydney).title("current location"));
+//        mMap.addMarker(new MarkerOptions().position(sydney).title("current location"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         mMap.setMyLocationEnabled(true);
     }

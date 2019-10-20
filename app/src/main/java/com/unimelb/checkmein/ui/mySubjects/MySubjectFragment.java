@@ -45,12 +45,14 @@ public class MySubjectFragment extends SubjectFragment {
         FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Subject>()
                 .setQuery(postsQuery, Subject.class)
                 .build();
+        mProgressDialog.dismiss();
 
         mAdapter = new FirebaseRecyclerAdapter<Subject, SubjectViewHolder>(options) {
 
             @Override
             public SubjectViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
                 LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
+
                 return new SubjectViewHolder(inflater.inflate(R.layout.recycler_item, viewGroup, false));
             }
 
@@ -68,7 +70,7 @@ public class MySubjectFragment extends SubjectFragment {
                         startActivity(intent);
                     }
                 });
-                mProgressDialog.dismiss();
+
             }
         };
         mRecycler.setAdapter(mAdapter);
