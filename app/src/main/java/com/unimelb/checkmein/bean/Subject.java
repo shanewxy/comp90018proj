@@ -7,7 +7,7 @@ public class Subject {
     private String code;
     private Map<String, User> students = new HashMap<>();
     private String name;
-    public Building building;
+    public Map<String, Session> sessions = new HashMap<>();
 
     public Subject() {
     }
@@ -51,13 +51,12 @@ public class Subject {
     }
 
 
-
-    public Building getBuilding() {
-        return building;
+    public Map<String, Session> getSessions() {
+        return sessions;
     }
 
-    public void setBuilding(Building building) {
-        this.building = building;
+    public void setSessions(Map<String,Session> sessions) {
+        this.sessions = sessions;
     }
 
     public Map<String, Object> toMap() {
@@ -65,7 +64,7 @@ public class Subject {
         result.put("code", code);
         result.put("name", name);
         result.put("students", students);
-        result.put("building", building);
+        result.put("sessions", sessions);
         return result;
     }
 

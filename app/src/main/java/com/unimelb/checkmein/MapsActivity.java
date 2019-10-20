@@ -5,7 +5,9 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -32,6 +34,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
 import com.unimelb.checkmein.bean.Building;
+import com.unimelb.checkmein.bean.Session;
 import com.unimelb.checkmein.bean.Subject;
 import com.unimelb.checkmein.bean.User;
 import com.unimelb.checkmein.ui.rank.RankViewHolder;
@@ -39,6 +42,7 @@ import com.unimelb.checkmein.ui.rank.ScrollingActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -86,6 +90,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 RankViewHolder.rank_increment = 1;
             }
         });
+
         button = findViewById(R.id.checkInButton);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -93,47 +98,72 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 postRef.runTransaction(new Transaction.Handler() {
                     @Override
                     public Transaction.Result doTransaction(MutableData mutableData) {
-                        Subject p = mutableData.getValue(Subject.class);
-                        if (p == null) {
+                        Subject subject = mutableData.getValue(Subject.class);
+                        if (subject == null) {
                             return Transaction.success(mutableData);
                         }
-                        Map<String, User> students = p.getStudents();
-                        Building building = p.getBuilding();
-                        float[] distance = new float[3];
-                        Location.distanceBetween(building.latitude, building.longitude, lastLocation.getLatitude(), lastLocation.getLongitude(), distance);
+
 
 //                        LatLng target = new LatLng(building.getLatitude(), building.getLongitude());
-//                        mMap.addMarker(new MarkerOptions().position(target).title(p.getName()));
+//                        mMap.addMarker(new MarkerOptions().position(target).title(subject.getName()));
 //                        mMap.moveCamera(CameraUpdateFactory.newLatLng(target));
-                        Log.d(TAG, "doTransaction: " + distance[0]);
+                        Map<String, User> students = subject.getStudents();
+                        Date currentTime = Calendar.getInstance().getTime();
+                        Log.d(TAG, "doTransaction: " + currentTime);
                         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-                        String today = sdf.format(Calendar.getInstance().getTime());
+                        String today = sdf.format(currentTime);
                         User user = students.get(getUid());
-
-                        if (!today.equals(user.date) && distance[0] < 100) {
-                            // Unstar the post and remove self from stars
-                            user.count += 1;
-                            user.date = today;
-                            students.put(getUid(), user);
-                            mutableData.setValue(p);
-                            return Transaction.success(mutableData);
-                        } else {
+                        if (today.equals(user.date)) {
+                            makeToast("Fail! Repetitive check in!");
                             return Transaction.abort();
                         }
+
+
+                        Map<String, Session> sessionMap = subject.getSessions();
+                        for (String key : sessionMap.keySet()) {
+                            Session session = sessionMap.get(key);
+                            Building building = session.building;
+                            int start = session.start;
+                            int end = session.end;
+                            int day = session.day;
+                            int currenthour = currentTime.getHours();
+                            int currentday = currentTime.getDay();
+                            Log.d(TAG, "doTransaction: "+start);
+                            Log.d(TAG, "doTransaction: "+end);
+                            Log.d(TAG, "doTransaction: "+day);
+                            Log.d(TAG, "doTransaction: "+currentday);
+                            Log.d(TAG, "doTransaction: "+currenthour);
+                            float[] distance = new float[3];
+                            Location.distanceBetween(building.latitude, building.longitude, lastLocation.getLatitude(), lastLocation.getLongitude(), distance);
+                            if (currentday == day && currenthour >= start && currenthour <= end && distance[0] < 100) {
+                                user.count += 1;
+                                user.date = today;
+                                students.put(getUid(), user);
+                                mutableData.setValue(subject);
+                                makeToast("Successfully checked in!");
+                                return Transaction.success(mutableData);
+                            }
+                        }
+                        makeToast("Fail! Wrong time or location!");
+                        return Transaction.abort();
                     }
 
                     @Override
                     public void onComplete(DatabaseError databaseError, boolean b,
                                            DataSnapshot dataSnapshot) {
                         // Transaction completed
-                        if (b)
-                            Toast.makeText(MapsActivity.this, "successfully checked in!", Toast.LENGTH_SHORT).show();
-                        else
-                            Toast.makeText(MapsActivity.this, "Fail!!", Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "postTransaction:onComplete:" + databaseError);
 
                     }
                 });
+            }
+        });
+    }
+
+    public void makeToast(final String msg) {
+        MapsActivity.this.runOnUiThread(new Runnable() {
+            public void run() {
+                Toast.makeText(MapsActivity.this, msg, Toast.LENGTH_SHORT).show();
             }
         });
     }

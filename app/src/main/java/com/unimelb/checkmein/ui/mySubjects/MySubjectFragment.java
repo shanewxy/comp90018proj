@@ -1,5 +1,6 @@
 package com.unimelb.checkmein.ui.mySubjects;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -38,6 +39,7 @@ public class MySubjectFragment extends SubjectFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
         Query postsQuery = getQuery(mDatabase);
 
         FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Subject>()
@@ -66,6 +68,7 @@ public class MySubjectFragment extends SubjectFragment {
                         startActivity(intent);
                     }
                 });
+                mProgressDialog.dismiss();
             }
         };
         mRecycler.setAdapter(mAdapter);

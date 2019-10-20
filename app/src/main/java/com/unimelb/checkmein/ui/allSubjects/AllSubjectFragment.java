@@ -33,11 +33,11 @@ public class AllSubjectFragment extends SubjectFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-                Query postsQuery = getQuery(mDatabase);
+        Query postsQuery = getQuery(mDatabase);
         FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Subject>()
                 .setQuery(postsQuery, Subject.class)
                 .build();
-        Log.d(TAG, "onActivityCreated: "+options.getSnapshots());
+        Log.d(TAG, "onActivityCreated: " + options.getSnapshots());
         mAdapter = new FirebaseRecyclerAdapter<Subject, SubjectViewHolder>(options) {
 
             @Override
@@ -73,10 +73,11 @@ public class AllSubjectFragment extends SubjectFragment {
                             updates.put("/user-subjects/" + getUid() + "/" + postKey, null);
 
                         }
-                            mDatabase.updateChildren(updates);
+                        mDatabase.updateChildren(updates);
+
                     }
                 });
-//
+                mProgressDialog.dismiss();
             }
         };
         mRecycler.setAdapter(mAdapter);

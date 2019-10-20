@@ -1,5 +1,6 @@
 package com.unimelb.checkmein.ui;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -36,6 +37,7 @@ public abstract class SubjectFragment extends Fragment {
     protected RecyclerView mRecycler;
     protected LinearLayoutManager mManager;
     FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+    public ProgressDialog mProgressDialog;
 
     public SubjectFragment() {
     }
@@ -59,7 +61,9 @@ public abstract class SubjectFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
+        mProgressDialog=new ProgressDialog(getActivity());
+        mProgressDialog.setMessage("loading");
+        mProgressDialog.show();
         // Set up Layout Manager, reverse layout
         mManager = new LinearLayoutManager(getActivity());
         mManager.setReverseLayout(true);
