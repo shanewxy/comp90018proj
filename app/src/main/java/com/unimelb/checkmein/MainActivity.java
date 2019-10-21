@@ -3,6 +3,8 @@ package com.unimelb.checkmein;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -12,8 +14,10 @@ import com.google.android.material.snackbar.Snackbar;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -37,7 +41,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private AppBarConfiguration mAppBarConfiguration;
     private FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -46,6 +50,11 @@ public class MainActivity extends AppCompatActivity {
     private static final int OPEN_CAMERA = 2;
     NavigationView navigationView;
     File file;
+    private static final int IMAGE_REQUEST_CODE = 0;
+    private static final int CAMERA_REQUEST_CODE = 1;
+    private static final int RESIZE_REQUEST_CODE = 2;
+
+    private static final String IMAGE_FILE_NAME = "header.jpg";
 
     View hView;
     ImageView image;
@@ -59,19 +68,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                auth.signOut();
-                finish();
-                Intent intent = new Intent();
-                intent.setClass(MainActivity.this, LoginActivity.class);
-                startActivity(intent);
-            }
-        });
+
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
         file = new File(Environment.getExternalStorageDirectory(),
@@ -90,19 +87,54 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
         nav_user.setText(email);
-//        image.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//////                // 隐式意图打开系统界面 --要求回传
-////                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-////                // 存到什么位置
-////                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
-////                startActivityForResult(intent, 1);
-//                Intent intent = new Intent(Intent.ACTION_PICK);
-//                intent.setType("image/*");
+        image.setOnClickListener(this);
+        findViewById(R.id.fab).setOnClickListener(this);
+//        findViewById(R.id.nav_send).setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View v) {
+        int i = v.getId();
+        if (i == R.id.nav_send) {
+            auth.signOut();
+            finish();
+            Intent intent = new Intent();
+            intent.setClass(MainActivity.this, LoginActivity.class);
+            startActivity(intent);
+        } else if (i == R.id.imageView) {
+            //                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//                // 存到什么位置
+//                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
 //                startActivityForResult(intent, 1);
-//            }
-//        });
+            Intent intent = new Intent(Intent.ACTION_PICK);
+            intent.setType("image/*");
+            startActivityForResult(intent, 1);
+//            Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
+//            galleryIntent.addCategory(Intent.CATEGORY_OPENABLE);
+//            galleryIntent.setType("image/*");
+//            startActivityForResult(galleryIntent, IMAGE_REQUEST_CODE);
+
+        } else if (i == R.id.fab) {
+            auth.signOut();
+            finish();
+            Intent intent = new Intent();
+            intent.setClass(MainActivity.this, LoginActivity.class);
+            startActivity(intent);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId()==R.id.nav_send){
+            Log.d("dff", "onOptionsItemSelected: ");
+            auth.signOut();
+            finish();
+            Intent intent = new Intent();
+            intent.setClass(MainActivity.this, LoginActivity.class);
+            startActivity(intent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -122,6 +154,9 @@ public class MainActivity extends AppCompatActivity {
     public void crop(Uri uri) {
         // 定义图片裁剪意图
         Intent intent = new Intent("com.android.camera.action.CROP");
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
+
+
         intent.setDataAndType(uri, "image/*");
         // 设置是否裁剪
         intent.putExtra("crop", "true");
@@ -141,6 +176,71 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, CROP);
 
     }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        if (resultCode != RESULT_OK) {
+//            return;
+//        } else {
+//            switch (requestCode) {
+//                case IMAGE_REQUEST_CODE:
+//                    resizeImage(data.getData());
+//                    break;
+//                case CAMERA_REQUEST_CODE:
+//                    if (isSdcardExisting()) {
+//                        resizeImage(getImageUri());
+//                    } else {
+//                        Toast.makeText(MainActivity.this, "未找到存储卡，无法存储照片！",
+//                                Toast.LENGTH_LONG).show();
+//                    }
+//                    break;
+//
+//                case RESIZE_REQUEST_CODE:
+//                    if (data != null) {
+//                        showResizeImage(data);
+//                    }
+//                    break;
+//            }
+//        }
+//
+//        super.onActivityResult(requestCode, resultCode, data);
+//    }
+    private boolean isSdcardExisting() {
+        final String state = Environment.getExternalStorageState();
+        if (state.equals(Environment.MEDIA_MOUNTED)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void resizeImage(Uri uri) {
+        Intent intent = new Intent("com.android.camera.action.CROP");
+        intent.setDataAndType(uri, "image/*");
+        intent.putExtra("crop", "true");
+        intent.putExtra("aspectX", 1);
+        intent.putExtra("aspectY", 1);
+        intent.putExtra("outputX", 150);
+        intent.putExtra("outputY", 150);
+        intent.putExtra("return-data", true);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
+
+        startActivityForResult(intent, RESIZE_REQUEST_CODE);
+    }
+
+    private void showResizeImage(Intent data) {
+        Bundle extras = data.getExtras();
+        if (extras != null) {
+            Bitmap photo = extras.getParcelable("data");
+            Drawable drawable = new BitmapDrawable(photo);
+            image.setImageDrawable(drawable);
+        }
+    }
+
+    private Uri getImageUri() {
+        return Uri.fromFile(new File(Environment.getExternalStorageDirectory(),
+                IMAGE_FILE_NAME));
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -164,13 +264,16 @@ public class MainActivity extends AppCompatActivity {
             // 把bitmap放置到文件中
             // format 格式
             // quality 质量
+            Drawable drawable = new BitmapDrawable(bitmap);
+            image.setImageDrawable(drawable);
             try {
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(
                         picFile));
+
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-            image.setImageBitmap(bitmap);
+//            image.setImageBitmap(bitmap);
 
         }
     }

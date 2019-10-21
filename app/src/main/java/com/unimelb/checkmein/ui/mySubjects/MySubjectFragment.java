@@ -60,7 +60,7 @@ public class MySubjectFragment extends SubjectFragment {
             protected void onBindViewHolder(SubjectViewHolder viewHolder, int position, final Subject model) {
 
                 final DatabaseReference postRef = getRef(position);
-                viewHolder.aSwitch.setVisibility(View.GONE);
+                viewHolder.linearLayout.removeView(viewHolder.aSwitch);
                 viewHolder.bindToPost(model, new TextView.OnClickListener() {
                     @Override
                     public void onClick(View view) {

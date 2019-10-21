@@ -168,5 +168,6 @@
     <orderEntry type="library" name="Gradle: com.google.firebase:firebase-database-collection:17.0.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.google.maps.android:android-maps-utils:0.5@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.yqritc:recyclerview-flexibledivider:1.4.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.github.bigmanLau:CardviewFix:1.0.3@aar" level="project" />
   </component>
 </module>

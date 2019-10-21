@@ -3,6 +3,7 @@ package com.unimelb.checkmein.ui;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -17,10 +18,11 @@ public class SubjectViewHolder extends RecyclerView.ViewHolder {
     public Switch aSwitch;
     public TextView numStarsView;
     public TextView bodyView;
+    public LinearLayout linearLayout;
 
     public SubjectViewHolder(View itemView) {
         super(itemView);
-
+        linearLayout = itemView.findViewById(R.id.subjectLinearLayout);
 //        rank = itemView.findViewById(R.id.postTitle);
 //        authorView = itemView.findViewById(R.id.postAuthor);
         aSwitch = itemView.findViewById(R.id.switch1);
