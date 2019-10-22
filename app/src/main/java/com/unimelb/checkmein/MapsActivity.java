@@ -153,7 +153,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             }
                         }
                         if (lat == 0 && log == 0) {
-                            makeToast("Fail! Wrong day!");
+                            makeToast("Fail! No class today!");
                             return Transaction.abort();
                         }
                         if (!rightTime) {
@@ -233,7 +233,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -243,8 +242,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.ACCESS_FINE_LOCATION)) {
                 // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
+                //                // this thread waiting for the user's response! After the user
+                //                // sees the explanation, try again to request the permission.
             } else {
                 // No explanation needed; request the permission
                 ActivityCompat.requestPermissions(this,
@@ -268,7 +267,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             provider = LocationManager.NETWORK_PROVIDER;
 
         } else {
-            Toast.makeText(this, "请检查网络或GPS是否打开",
+            Toast.makeText(this, "Network or GPS disabled",
                     Toast.LENGTH_LONG).show();
             return;
         }
