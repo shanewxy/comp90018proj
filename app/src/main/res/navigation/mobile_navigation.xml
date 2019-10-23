@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/nav_home">
+    app:startDestination="@+id/nav_mysubject">
 
     <fragment
         android:id="@+id/nav_home"
@@ -13,13 +13,13 @@
 
 
     <fragment
-        android:id="@+id/nav_slideshow"
+        android:id="@+id/nav_mysubject"
         android:name="com.unimelb.checkmein.ui.mySubjects.MySubjectFragment"
         android:label="@string/menu_slideshow"
         tools:layout="@layout/fragment_allsubject" />
 
     <fragment
-        android:id="@+id/nav_gallery"
+        android:id="@+id/nav_allsubjects"
         android:name="com.unimelb.checkmein.ui.allSubjects.AllSubjectFragment"
         android:label="@string/menu_gallery"
         tools:layout="@layout/fragment_mysubject" />

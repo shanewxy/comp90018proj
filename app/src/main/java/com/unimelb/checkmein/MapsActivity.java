@@ -77,121 +77,109 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mMapView.getMapAsync(this);
         fab = findViewById(R.id.fabRank);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        fab.setOnClickListener(view -> {
 //                FragmentManager fragmentManager = getSupportFragmentManager();
 //                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 //                fragmentTransaction.replace(R.id.mapView2, RankFragment.newInstance(subjectKey));
 //                fragmentTransaction.commit();
-                Intent intent = new Intent();
-                intent.setClass(MapsActivity.this, ScrollingActivity.class);
-                intent.putExtra("subject", subjectKey);
-                startActivity(intent);
-                RankViewHolder.rank_increment = 1;
-            }
+            Intent intent = new Intent();
+            intent.setClass(MapsActivity.this, ScrollingActivity.class);
+            intent.putExtra("subject", subjectKey);
+            startActivity(intent);
+            RankViewHolder.rank_increment = 1;
         });
 
         button = findViewById(R.id.checkInButton);
-        button.setOnClickListener(new View.OnClickListener() {
+        button.setOnClickListener(view -> postRef.runTransaction(new Transaction.Handler() {
             @Override
-            public void onClick(View view) {
-                postRef.runTransaction(new Transaction.Handler() {
-                    @Override
-                    public Transaction.Result doTransaction(MutableData mutableData) {
-                        Subject subject = mutableData.getValue(Subject.class);
-                        if (subject == null) {
-                            return Transaction.success(mutableData);
-                        }
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                Subject subject = mutableData.getValue(Subject.class);
+                if (subject == null) {
+                    return Transaction.success(mutableData);
+                }
 
 
 //                        LatLng target = new LatLng(building.getLatitude(), building.getLongitude());
 //                        mMap.addMarker(new MarkerOptions().position(target).title(subject.getName()));
 //                        mMap.moveCamera(CameraUpdateFactory.newLatLng(target));
-                        Map<String, User> students = subject.getStudents();
-                        Date currentTime = Calendar.getInstance().getTime();
-                        Log.d(TAG, "doTransaction: " + currentTime);
-                        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-                        String today = sdf.format(currentTime);
-                        User user = students.get(getUid());
-                        if (today.equals(user.date)) {
-                            makeToast("Fail! Repetitive check in!");
-                            return Transaction.abort();
-                        }
+                Map<String, User> students = subject.getStudents();
+                Date currentTime = Calendar.getInstance().getTime();
+                Log.d(TAG, "doTransaction: " + currentTime);
+                SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+                String today = sdf.format(currentTime);
+                User user = students.get(getUid());
+                if (today.equals(user.date)) {
+                    makeToast("Fail! Repetitive check in!");
+                    return Transaction.abort();
+                }
 
-                        double lat = 0;
-                        double log = 0;
-                        boolean rightTime = false;
-                        Map<String, Session> sessionMap = subject.getSessions();
-                        for (String key : sessionMap.keySet()) {
-                            Session session = sessionMap.get(key);
-                            Building building = session.building;
-                            int start = session.start;
-                            int end = session.end;
-                            int day = session.day;
-                            int currenthour = currentTime.getHours();
-                            int currentday = currentTime.getDay();
+                double lat = 0;
+                double log = 0;
+                boolean rightTime = false;
+                Map<String, Session> sessionMap = subject.getSessions();
+                for (String key : sessionMap.keySet()) {
+                    Session session = sessionMap.get(key);
+                    Building building = session.building;
+                    int start = session.start;
+                    int end = session.end;
+                    int day = session.day;
+                    int currenthour = currentTime.getHours();
+                    int currentday = currentTime.getDay();
 
-                            LatLng target = new LatLng(building.getLatitude(), building.getLongitude());
+                    LatLng target = new LatLng(building.getLatitude(), building.getLongitude());
 //                            mMap.addMarker(new MarkerOptions().position(target).title(subject.getName()));
-                            float[] distance = new float[3];
-                            Location.distanceBetween(building.latitude, building.longitude, lastLocation.getLatitude(), lastLocation.getLongitude(), distance);
-                            if (currentday == day) {
-                                lat = building.latitude;
-                                log = building.longitude;
-                                if (currenthour >= start && currenthour <= end) {
-                                    rightTime = true;
-                                    if (distance[0] < 100) {
-                                        user.count += 1;
-                                        user.date = today;
-                                        students.put(getUid(), user);
-                                        mutableData.setValue(subject);
-                                        makeToast("Successfully checked in!");
-                                        return Transaction.success(mutableData);
-                                    }
-                                }
+                    float[] distance = new float[3];
+                    Location.distanceBetween(building.latitude, building.longitude, lastLocation.getLatitude(), lastLocation.getLongitude(), distance);
+                    if (currentday == day) {
+                        lat = building.latitude;
+                        log = building.longitude;
+                        if (currenthour >= start && currenthour <= end) {
+                            rightTime = true;
+                            if (distance[0] < 100) {
+                                user.count += 1;
+                                user.date = today;
+                                students.put(getUid(), user);
+                                mutableData.setValue(subject);
+                                makeToast("Successfully checked in!");
+                                return Transaction.success(mutableData);
                             }
                         }
-                        if (lat == 0 && log == 0) {
-                            makeToast("Fail! No class today!");
-                            return Transaction.abort();
-                        }
-                        if (!rightTime) {
-                            makeToast("Fail! Not in class time!");
-                            return Transaction.abort();
-                        }
-                        Intent intent = new Intent(Intent.ACTION_VIEW,
-                                Uri.parse("http://maps.google.com/maps?"
-                                        + "saddr=" + lastLocation.getLatitude() + "," + lastLocation.getLongitude()
-                                        + "&daddr=" + lat + "," + log
-                                        + "&avoid=highway"
-                                        + "&language=zh-CN")
-                        );
-
-                        intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
-                        startActivity(intent);
-                        makeToast("Fail! Location too far away!");
-                        return Transaction.abort();
                     }
+                }
+                if (lat == 0 && log == 0) {
+                    makeToast("Fail! No class today!");
+                    return Transaction.abort();
+                }
+                if (!rightTime) {
+                    makeToast("Fail! Not in class time!");
+                    return Transaction.abort();
+                }
+                Intent intent = new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("http://maps.google.com/maps?"
+                                + "saddr=" + lastLocation.getLatitude() + "," + lastLocation.getLongitude()
+                                + "&daddr=" + lat + "," + log
+                                + "&avoid=highway"
+                        )
+                );
 
-                    @Override
-                    public void onComplete(DatabaseError databaseError, boolean b,
-                                           DataSnapshot dataSnapshot) {
-                        // Transaction completed
-                        Log.d(TAG, "postTransaction:onComplete:" + databaseError);
-
-                    }
-                });
+                intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+                startActivity(intent);
+                makeToast("Fail! Location too far away!");
+                return Transaction.abort();
             }
-        });
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b,
+                                   DataSnapshot dataSnapshot) {
+                // Transaction completed
+                Log.d(TAG, "postTransaction:onComplete:" + databaseError);
+
+            }
+        }));
     }
 
     public void makeToast(final String msg) {
-        MapsActivity.this.runOnUiThread(new Runnable() {
-            public void run() {
-                Toast.makeText(MapsActivity.this, msg, Toast.LENGTH_SHORT).show();
-            }
-        });
+        MapsActivity.this.runOnUiThread(() -> Toast.makeText(MapsActivity.this, msg, Toast.LENGTH_SHORT).show());
     }
 
     LocationListener locationListener = new LocationListener() {
