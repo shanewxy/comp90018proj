@@ -185,6 +185,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
+            lastLocation = location;
             LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
 //            mMarker = mMap.addMarker(new MarkerOptions().position(loc));
             if (mMap != null) {
